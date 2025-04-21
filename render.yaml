@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: virtual-assistant
+    env: node
+    buildCommand: ./deploy.sh
+    startCommand: NODE_ENV=production node dist/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+    healthCheckPath: /
+    autoDeploy: true
+    plan: free
+    root: .
