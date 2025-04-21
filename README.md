@@ -4,17 +4,21 @@ A mobile application with a tile-based interface and a persistent avatar that in
 
 ## Deployment on Render
 
-### Automated Deployment
-This project includes a `render.yaml` file for Blueprint deployment on Render.
+To deploy this application on Render:
 
-### Manual Deployment Steps
 1. Create a new Web Service on Render
 2. Link to your GitHub repository
 3. Use the following settings:
    - **Environment**: Node
    - **Build Command**: `chmod +x render-build.sh && ./render-build.sh`
-   - **Start Command**: `NODE_ENV=production node dist/index.js`
+   - **Start Command**: `NODE_ENV=production node dist/server.js`
    - **Root Directory**: /
+
+## Important Files
+
+- `render-build.sh`: Custom build script for Render deployment
+- `Procfile`: Specifies the command to start the application
+- `index.js`: Fallback server file if the build process encounters issues
 
 ## Running Locally
 ```
