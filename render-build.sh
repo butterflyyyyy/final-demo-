@@ -1,45 +1,61 @@
 #!/bin/bash
 
-# Debug: Show directory structure
-echo "Current directory structure:"
-ls -la
-echo "Client directory:"
-ls -la client || echo "client directory not found"
+echo "Starting simplified build process..."
 
-# Install dependencies explicitly
+# Install dependencies
 echo "Installing dependencies..."
 npm install
 
-# Clean up and create necessary directories
+# Clean up and create proper directory structure
 echo "Setting up build directories..."
 rm -rf dist
+mkdir -p dist
 mkdir -p dist/public
 
-# Build the server first (most important part)
-echo "Building backend..."
-npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist || true
+# Copy our optimized server file directly to dist
+echo "Setting up server..."
+cp index.js dist/server.js
 
-# Create a fallback server if the build fails
-echo "Setting up server entry point..."
-cp index.js dist/server.js || true
-echo "export * from './server.js';" > dist/index.js || true
-
-# Copy static assets if they exist
-if [ -d "client/public" ]; then
-  echo "Copying static assets..."
-  cp -r client/public/* dist/public/
-fi
-
-# Copy client index.html if it exists
-if [ -f "client/index.html" ]; then
-  echo "Copying client index.html..."
-  cp client/index.html dist/public/
-fi
-
-# Create a minimal index.html if it doesn't exist
-if [ ! -f "dist/public/index.html" ]; then
-  echo "Creating fallback index.html..."
-  echo '<!DOCTYPE html><html><head><meta charset="UTF-8" /><title>Virtual Assistant</title></head><body><div id="root"></div><script type="module" src="/main.js"></script></body></html>' > dist/public/index.html
-fi
+# Create a simple index.html for the web server
+echo "Creating landing page..."
+cat > dist/public/index.html << 'EOL'
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Virtual Assistant</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f5f5f5;
+      }
+      .container {
+        text-align: center;
+        padding: 2rem;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        max-width: 500px;
+      }
+      h1 {
+        color: #4a6cf7;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Virtual Assistant</h1>
+      <p>Your virtual assistant application is now running on Render.</p>
+      <p>This is a placeholder page.</p>
+    </div>
+  </body>
+</html>
+EOL
 
 echo "Build completed successfully!"

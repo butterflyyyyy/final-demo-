@@ -1,25 +1,37 @@
-// Simple server entry point for Render deployment
-import express from 'express';
-import { dirname, join } from 'path';
-import { fileURLToPath } from 'url';
+// Simple server for Render deployment
+const express = require('express');
+const path = require('path');
+const fs = require('fs');
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 10000;
 
-// Serve static files from the "public" directory
-app.use(express.static(join(__dirname, 'dist/public')));
+// Define the public directory path
+const publicDir = path.join(__dirname, 'public');
+
+// Ensure the public directory exists
+if (!fs.existsSync(publicDir)) {
+  fs.mkdirSync(publicDir, { recursive: true });
+}
+
+// Serve static files
+app.use(express.static(publicDir));
 
 // Handle API requests
 app.get('/api/*', (req, res) => {
-  res.json({ message: 'API endpoint reached', path: req.path });
+  res.json({ 
+    message: 'API endpoint reached', 
+    path: req.path,
+    status: 'This is a placeholder API response'
+  });
 });
 
-// For any other GET request, send back the index.html file
+// Default route - serve index.html
 app.get('*', (req, res) => {
-  res.sendFile(join(__dirname, 'dist/public/index.html'));
+  res.sendFile(path.join(publicDir, 'index.html'));
 });
 
+// Start the server
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  console.log(`Server running on port ${port}`);
 });
